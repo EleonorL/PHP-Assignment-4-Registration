@@ -3,13 +3,12 @@
   * Solution for assignment 2
   * @author Daniel Toll
   */
-namespace model;
 
-require_once("UserCredentials.php");
-require_once("TempCredentials.php");
-require_once("TempCredentialsDAL.php");
-require_once("LoggedInUser.php");
-require_once("UserClient.php");
+require_once("model/UserCredentials.php");
+require_once("model/TempCredentials.php");
+require_once("model/TempCredentialsDAL.php");
+require_once("model/LoggedInUser.php");
+require_once("model/UserClient.php");
 
 
 
@@ -26,7 +25,7 @@ class LoginModel {
 	private $tempDAL;
 
 	public function __construct() {
-		self::$sessionUserLocation .= \Settings::APP_SESSION_NAME;
+		self::$sessionUserLocation .= Settings::APP_SESSION_NAME;
 
 		if (!isset($_SESSION)) {
 			//Alternate check with newer PHP
@@ -64,7 +63,7 @@ class LoginModel {
 		
 		$this->tempCredentials = $this->tempDAL->load($uc->getName());
 
-		$loginByUsernameAndPassword = \Settings::USERNAME === $uc->getName() && \Settings::PASSWORD === $uc->getPassword();
+		$loginByUsernameAndPassword = Settings::USERNAME === $uc->getName() && Settings::PASSWORD === $uc->getPassword();
 		$loginByTemporaryCredentials = $this->tempCredentials != null && $this->tempCredentials->isValid($uc->getTempPassword());
 
 		if ( $loginByUsernameAndPassword || $loginByTemporaryCredentials) {
