@@ -30,6 +30,7 @@ class LoginView {
 	private $loginHasFailed = false;
 	private $loginHasSucceeded = false;
 	private $userDidLogout = false;
+	private $userDidRegister = false;
 
 	/**
 	 * @var LoginModel
@@ -103,7 +104,12 @@ class LoginView {
 	 * call this when user logged out
 	 */
 	public function setUserLogout() {
-		$this->userDidLogout = true;	
+		$this->userDidLogout = true;
+	}
+
+	public function setUserRegistration() {
+		$this->userDidRegister = true;
+		$this->redirect("Register new user. ");
 	}
 
 	/**
