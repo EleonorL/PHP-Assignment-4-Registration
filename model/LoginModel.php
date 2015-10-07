@@ -9,6 +9,7 @@ require_once("model/TempCredentials.php");
 require_once("model/TempCredentialsDAL.php");
 require_once("model/LoggedInUser.php");
 require_once("model/UserClient.php");
+require_once("model/UserDAL.php");
 
 
 
@@ -21,8 +22,10 @@ class LoginModel {
 	 * @var null | TempCredentials
 	 */
 	private $tempCredentials = null;
+	private $user;
 
 	private $tempDAL;
+	private $userDAL;
 
 	public function __construct() {
 		self::$sessionUserLocation .= Settings::APP_SESSION_NAME;
@@ -33,6 +36,7 @@ class LoginModel {
 			assert("No session started");
 		}
 		$this->tempDAL = new TempCredentialsDAL();
+		$this->userDAL = new UserDAL();
 		
 	}
 
@@ -60,20 +64,21 @@ class LoginModel {
 	 * @return boolean
 	 */
 	public function doLogin(UserCredentials $uc) {
-		
-		$this->tempCredentials = $this->tempDAL->load($uc->getName());
 
-		$loginByUsernameAndPassword = Settings::USERNAME === $uc->getName() && Settings::PASSWORD === $uc->getPassword();
-		$loginByTemporaryCredentials = $this->tempCredentials != null && $this->tempCredentials->isValid($uc->getTempPassword());
+			$this->tempCredentials = $this->tempDAL->load($uc->getName());
+			$password = $this->userDAL->load($uc->getName());
 
-		if ( $loginByUsernameAndPassword || $loginByTemporaryCredentials) {
-			$user = new LoggedInUser($uc); 
+			$loginByUsernameAndPassword = $uc->getName() !== null && $password === $uc->getPassword();
+			$loginByTemporaryCredentials = $this->tempCredentials != null && $this->tempCredentials->isValid($uc->getTempPassword());
 
-			$_SESSION[self::$sessionUserLocation] = $user;
+			if ( $loginByUsernameAndPassword || $loginByTemporaryCredentials) {
+				$user = new LoggedInUser($uc);
 
-			return true;
-		}
-		return false;
+				$_SESSION[self::$sessionUserLocation] = $user;
+
+				return true;
+			}
+			return false;
 	}
 
 	public function doLogout() {

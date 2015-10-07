@@ -2,30 +2,22 @@
 
 class UserDAL {
 
-    public function checkUserFile($name) {
-        if(file_exists(self::getFileName($name))) {
+    public function register($name, $password) {
+        if(file_exists(self::getFileName($name)))
             return false;
-        }
-        else
+        else {
+            file_put_contents(self::getFileName($name), serialize($password));
             return true;
+        }
     }
 
     public function load($name) {
-        if($this->checkUserFile($name)) {
-            $fileContent = file_get_contents(self::getFileName($name));
-            if($fileContent !== FALSE) {
-                return unserialize($fileContent);
-            }
-        }
-        return null;
-    }
-
-    public function save(User $u) {
-        file_put_contents($u->getUsername(), serialize($u->getPassword()));
+        if(file_exists(self::getFileName($name)))
+            return unserialize(file_get_contents(self::getFileName($name)));
     }
 
     public function getFileName($name) {
-        return Settings::DATAPATH . addslashes($name);
+        return Settings::USERPATH . addslashes($name);
     }
 
 }

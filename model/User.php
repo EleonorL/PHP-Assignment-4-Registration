@@ -14,8 +14,8 @@ class User {
         $this->dal = new UserDAL();
     }
 
-    public function registerUser($user) {
-        return  $this->dal->checkUserFile($user);
+    public function registerUser() {
+        return $this->dal->register($this->name, $this->password);
     }
 
     public function getUsername() {
@@ -26,8 +26,5 @@ class User {
         return $this->password;
     }
 
-    public function saveUser($user) {
-        $this->dal->save($user);
-    }
 
 }

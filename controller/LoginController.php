@@ -39,10 +39,10 @@ class LoginController {
 				}
 			}
 
-			elseif($this->regView->userWantsToRegister() && $this->regView->checkForm()) {
+			else if ($this->regView->userWantsToRegister() && $this->regView->checkForm()) {
                 $user = $this->regView->getUser();
-                if ($user->registerUser($user) == true) {
-                    $user->saveUser($user);
+                if ($user->registerUser() == true) {
+					$this->regView->setRegSuccess();
                     $this->view->setUserRegistration();
                 }
 				else

@@ -21,7 +21,8 @@ class LoginView {
 	 * This name is used in session
 	 * @var string
 	 */
-	private static $sessionSaveLocation = "\\view\\LoginView\\message";
+	private static $sessionSaveLocation;
+	private static $userSaveLocation;
 
 	/**
 	 * view state set by controller through setters
@@ -41,7 +42,8 @@ class LoginView {
 	 * @param LoginModel $model
 	 */
 	public function __construct(LoginModel $model) {
-		self::$sessionSaveLocation .= Settings::APP_SESSION_NAME;
+		self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
+		self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
 		$this->model = $model;
 	}
 
@@ -109,7 +111,6 @@ class LoginView {
 
 	public function setUserRegistration() {
 		$this->userDidRegister = true;
-		$this->redirect("Register new user. ");
 	}
 
 	/**
@@ -147,6 +148,7 @@ class LoginView {
 			$this->redirect($message);
 		} else {
 			$message = $this->getSessionMessage();
+			$this->getSessionUser();
 			
 		}
 
@@ -203,6 +205,12 @@ class LoginView {
 			return $message;
 		}
 		return "";
+	}
+	private function getSessionUser() {
+		if (isset($_SESSION[self::$userSaveLocation])) {
+			$_POST[self::$name] = $_SESSION[self::$userSaveLocation];
+			unset($_SESSION[self::$userSaveLocation]);
+		}
 	}
 
 	/**

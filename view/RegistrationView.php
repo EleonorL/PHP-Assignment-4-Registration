@@ -5,7 +5,7 @@ require_once("model/User.php");
 
 class RegistrationView {
 
-    private static $registration = "RegisterView::Register";
+    private static $register = "RegisterView::Register";
     private static $message = "RegisterView::Message";
     private static $name = "RegisterView::UserName";
     private static $password = "RegisterView::Password";
@@ -15,6 +15,14 @@ class RegistrationView {
     private $regSuccess = false;
     private $regFail = false;
 
+    private static $sessionSaveLocation;
+    private static $userSaveLocation;
+
+    public function __construct() {
+        self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
+        self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
+    }
+
     private function generateRegistrationForm($message){
         return '<h2>Register new user</h2>
                 <form action="?register" method="post" enctype="multipart/form-data">
@@ -22,7 +30,7 @@ class RegistrationView {
                     <legend>Register a new user - Write username and password</legend>
                         <p id="'.self::$message.'">'.$message.'</p>
                         <label for="'.self::$name.'">Username :</label>
-                        <input type="text" size="20" name="'.self::$name.'" id="'.self::$name.'" value="'.$this->getUserName().'">
+                        <input type="text" size="20" name="'.self::$name.'" id="'.self::$name.'" value="'.$this->getUsername().'">
                         <br>
                         <label for="'.self::$password.'">Password  :</label>
                         <input type="password" size="20" name="'.self::$password.'" id="'.self::$password.'" value="">
@@ -30,7 +38,7 @@ class RegistrationView {
                         <label for="'.self::$passRepeat.'">Repeat password  :</label>
                         <input type="password" size="20" name="'.self::$passRepeat.'" id="'.self::$passRepeat.'" value="">
                         <br>
-                        <input id="submit" type="submit" name="'.self::$registration.'" value="Register">
+                        <input id="submit" type="submit" name="'.self::$register.'" value="Register">
                         <br>
                     </fieldset>
                 </form>';
@@ -43,21 +51,24 @@ class RegistrationView {
     private function doRegistrationForm() {
         $message = "";
         if($this->userWantsToRegister()) {
-            if(!self::checkUsername())
+            if (strlen($this->getUsername()) < 3)
                 $message .= "Username has too few characters, at least 3 characters.";
             if ($this->getPassword() !== $this->getPassRepeat())
                 $message .= "Passwords do not match.";
-            if(!self::checkPassword())
+            if (strlen($this->getPassword()) < 6)
                 $message .= "Password has too few characters, at least 6 characters.";
-
-            if($this->regFail)
-                $message = "User exists, pick another username";
+            if (!ctype_alnum($this->getUsername())){
+                $message .= "Username contains invalid characters.";
+                $this->removeHTML();
+            }
+            if ($this->regFail)
+                $message = "User exists, pick another username.";
         }
         return $this->generateRegistrationForm($message);
     }
 
     public function userWantsToRegister() {
-        return isset($_POST[self::$registration]);
+        return isset($_POST[self::$register]);
     }
 
     public function clickedRegister() {
@@ -65,7 +76,7 @@ class RegistrationView {
     }
 
     public function getRegLink() {
-        return '<a href="?' . self::$regLink . '">Register a new user</a>';
+        return '<a href="?'.self::$regLink.'">Register a new user</a>';
     }
 
     public function getLoginLink() {
@@ -73,17 +84,17 @@ class RegistrationView {
     }
 
     public function checkForm() {
-        return (!self::checkUsername() && !self::checkPassword() && !self::comparePasswords());
+        return strlen($this->getUsername()) > 2 && strlen($this->getPassword()) > 5
+        && ($this->getPassword() === $this->getPassRepeat()) && ctype_alnum($this->getUsername());
     }
 
     public function setRegFail() {
         $this->regFail = true;
     }
 
-    public function setRegSuccess() {
+    public function setRegSuccess(){
         $this->regSuccess = true;
     }
-
 
     private function getUsername() {
         if(isset($_POST[self::$name])) {
@@ -110,22 +121,9 @@ class RegistrationView {
         return new User($this->getUsername(), $this->getPassword());
     }
 
-    private function checkUsername() {
-        if(strlen($this->getUsername() < 3))
-            return false;
-        return true;
-    }
-
-    private function checkPassword() {
-        if(strlen($this->getPassword() < 6))
-            return false;
-        return true;
-    }
-
-    private function comparePasswords() {
-        if(strlen($this->getPassword()) !== strlen($this->getPassRepeat()))
-            return false;
-        return true;
+    public function removeHTML() {
+        $name = $this->getUsername();
+        $_POST[self::$name] = strip_tags($name);
     }
 
 }
