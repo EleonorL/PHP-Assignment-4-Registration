@@ -28,7 +28,7 @@ class LayoutView {
   ?>
     <div class="container" >
       <?php
-      if($r->clickedRegister())
+      if($r->clickedRegister() && $r->regSuccess() === false)
         echo $r->response();
       else
         echo $v->response();

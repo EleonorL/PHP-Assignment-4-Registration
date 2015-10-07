@@ -88,12 +88,19 @@ class RegistrationView {
         && ($this->getPassword() === $this->getPassRepeat()) && ctype_alnum($this->getUsername());
     }
 
+    public function setRegSuccess() {
+        $_SESSION[self::$sessionSaveLocation] = "Registered new user.";
+        $_SESSION[self::$userSaveLocation] = $this->getUsername();
+        unset($_GET[self::$regLink]);
+        $this->regSuccess = true;
+    }
+
     public function setRegFail() {
         $this->regFail = true;
     }
 
-    public function setRegSuccess(){
-        $this->regSuccess = true;
+    public function regSuccess() {
+        return $this->regSuccess;
     }
 
     private function getUsername() {

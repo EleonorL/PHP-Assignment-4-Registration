@@ -128,7 +128,6 @@ class LoginView {
 		}
 	}
 
-
 	/**
 	 * @sideeffect Sets cookies!
 	 * @return [String HTML
@@ -183,6 +182,7 @@ class LoginView {
 			$message =  "Wrong name or password";
 		} else {
 			$message = $this->getSessionMessage();
+			$this->getSessionUser();
 		}
 
 		//cookies
