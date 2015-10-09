@@ -2,6 +2,9 @@
 
 class UserDAL {
 
+    /**
+     * Saves the user
+     */
     public function register($name, $password) {
         if(file_exists(self::getFileName($name)))
             return false;

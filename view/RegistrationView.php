@@ -83,11 +83,18 @@ class RegistrationView {
         return '<a href="?">Back to login</a>';
     }
 
+    /**
+     * Method that controls if the input values are valid.
+     *
+     */
     public function checkForm() {
         return strlen($this->getUsername()) > 2 && strlen($this->getPassword()) > 5
         && ($this->getPassword() === $this->getPassRepeat()) && ctype_alnum($this->getUsername());
     }
 
+    /**
+     * If registration is successful this method is called from the controller
+     */
     public function setRegSuccess() {
         $_SESSION[self::$sessionSaveLocation] = "Registered new user.";
         $_SESSION[self::$userSaveLocation] = $this->getUsername();
@@ -131,6 +138,9 @@ class RegistrationView {
         return new User($this->getUsername(), $this->getPassword());
     }
 
+    /**
+     * Method used to strip the username of html tags
+     */
     public function removeHTML() {
         $name = $this->getUsername();
         $_POST[self::$name] = strip_tags($name);
